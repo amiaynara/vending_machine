@@ -9,7 +9,9 @@
 int ms0=5;
 int ms1=6;
 int ms2=7;
-
+int n=100; // this number will never be reached
+int N=10; // edit this to change the number of steppers present in the machine
+int stepper_array[N];
 int enable=10;
 #include <AccelStepper.h>
 
@@ -26,14 +28,33 @@ void setup()
   digitalWrite(ms0,HIGH);
   digitalWrite(ms1,HIGH);
   digitalWrite(ms2,HIGH);
+  //initialise the stepper array; note that this could be made two dimensional for better representation of the problem
+  for(int i=0;i<N;i++)
+  {
+    stepper_array[i]=i+1;
+  } 
   
+}
+
+//runs the stepper
+void run_stepper(int stepper_number)
+{
+  //enable nth stepper 
+  digitalWrite(stepper_array[stepper_number],HIGH);
+  while(True)    // If at the end of travel go to the other end
+  {
+    if(stepper.distanceToGo()==0)
+    {
+      stepper.moveTo(-stepper.currentPosition());
+      // break; // you will need to break once rotation is complete; you will need to find that TRIGGER 
+    }
+    stepper.run();
+  }
 }
 
 void loop()
 {
-    // If at the end of travel go to the other end
-    if (stepper.distanceToGo() == 0)
-      stepper.moveTo(-stepper.currentPosition());
 
-    stepper.run();
+  n=Serial.read();
+  run_stepper(n);
 }
